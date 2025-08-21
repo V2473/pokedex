@@ -3,6 +3,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Menu, Settings } from 'lucide-react';
+import Link from 'next/link';
 import { useUIStore } from '@/stores';
 import { Button } from '@/components/ui/Button';
 import { ThemeToggle } from '@/components/theme';
@@ -56,15 +57,14 @@ export const Header: React.FC = () => {
             </motion.span>
           </motion.a>
           <nav className="flex items-center space-x-6 text-sm font-medium">
-            {['Pokémon', 'Types', 'Generations', 'Favorites'].map((item, index) => (
-              <motion.a
-                key={item}
-                href="#"
-                className={`transition-colors ${
-                  index === 0
-                    ? 'text-foreground'
-                    : 'text-foreground/60 hover:text-foreground/80'
-                }`}
+            {[
+              { name: 'Pokémon', href: '/' },
+              { name: 'Types', href: '/types' },
+              { name: 'Generations', href: '/generations' },
+              { name: 'Favorites', href: '/favorites' }
+            ].map((item, index) => (
+              <motion.div
+                key={item.name}
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 + index * 0.1 }}
@@ -75,8 +75,17 @@ export const Header: React.FC = () => {
                 }}
                 style={{ transformStyle: 'preserve-3d' }}
               >
-                {item}
-              </motion.a>
+                <Link
+                  href={item.href}
+                  className={`transition-colors ${
+                    index === 0
+                      ? 'text-foreground'
+                      : 'text-foreground/60 hover:text-foreground/80'
+                  }`}
+                >
+                  {item.name}
+                </Link>
+              </motion.div>
             ))}
           </nav>
         </motion.div>
