@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
+import { motion, AnimatePresence } from 'framer-motion';
 import { X, Heart, HeartOff, Scale, Ruler, Zap } from 'lucide-react';
 import { Pokemon, MoveDetail } from '@/types';
 import { useFavoritesStore, useUIStore } from '@/stores';
@@ -95,238 +96,485 @@ export const PokemonModal: React.FC<PokemonModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center p-4">
-      <div className="bg-background rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto animate-in fade-in zoom-in">
+    <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center p-4 backdrop-blur-sm">
+      <motion.div
+        className="bg-background rounded-2xl max-w-4xl w-full max-h-[90vh] shadow-2xl flex flex-col"
+        initial={{
+          opacity: 0,
+          scale: 0.8,
+          rotateX: 15,
+          y: 50
+        }}
+        animate={{
+          opacity: 1,
+          scale: 1,
+          rotateX: 0,
+          y: 0
+        }}
+        exit={{
+          opacity: 0,
+          scale: 0.8,
+          rotateX: -15,
+          y: -50
+        }}
+        transition={{
+          type: "spring",
+          stiffness: 300,
+          damping: 25,
+          duration: 0.5
+        }}
+        style={{
+          transformStyle: 'preserve-3d',
+          perspective: '1200px'
+        }}
+      >
+        {/* 3D Background Effect */}
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-50 pointer-events-none"></div>
+        
         {/* Header */}
-        <div className="sticky top-0 bg-background z-10 border-b p-4 flex justify-between items-center">
+        <div className="sticky top-0 bg-background/95 backdrop-blur-md z-10 border-b p-6 flex justify-between items-center">
           <div className="flex items-center gap-3">
-            <div className="text-2xl font-bold capitalize">{pokemon.name}</div>
-            <div className="text-muted-foreground">#{pokemon.id.toString().padStart(3, '0')}</div>
+            <motion.div
+              className="text-3xl font-bold capitalize"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.2 }}
+            >
+              {pokemon.name}
+            </motion.div>
+            <motion.div
+              className="text-muted-foreground text-lg"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.3 }}
+            >
+              #{pokemon.id.toString().padStart(3, '0')}
+            </motion.div>
           </div>
           <div className="flex gap-2">
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              onClick={handleToggleFavorite}
-              className="text-rose-500 hover:text-rose-600"
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.4 }}
             >
-              {favorite ? <Heart className="h-5 w-5 fill-current" /> : <HeartOff className="h-5 w-5" />}
-            </Button>
-            <Button variant="ghost" size="icon" onClick={handleClose}>
-              <X className="h-5 w-5" />
-            </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handleToggleFavorite}
+                className="text-rose-500 hover:text-rose-600 hover:scale-110 transition-transform"
+              >
+                {favorite ? <Heart className="h-5 w-5 fill-current" /> : <HeartOff className="h-5 w-5" />}
+              </Button>
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.5 }}
+            >
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handleClose}
+                className="hover:scale-110 transition-transform"
+              >
+                <X className="h-5 w-5" />
+              </Button>
+            </motion.div>
           </div>
         </div>
 
         {/* Main Content */}
-        <div className="p-4">
+        <div className="flex-1 overflow-y-auto p-6">
           {/* Basic Info */}
-          <div className="flex flex-col md:flex-row gap-6 mb-6">
+          <div className="flex flex-col md:flex-row gap-8 mb-8">
             {/* Image */}
-            <div className="flex-1 flex justify-center">
+            <motion.div
+              className="flex-1 flex justify-center"
+              initial={{ opacity: 0, z: -50 }}
+              animate={{ opacity: 1, z: 0 }}
+              transition={{ delay: 0.3, duration: 0.5 }}
+              style={{ transformStyle: 'preserve-3d' }}
+            >
               <div className="relative w-64 h-64">
+                <motion.div
+                  className="absolute inset-0 rounded-full bg-gradient-to-br from-primary/20 to-transparent opacity-50 blur-xl"
+                  animate={{
+                    scale: [1, 1.1, 1],
+                    rotate: [0, 5, -5, 0]
+                  }}
+                  transition={{
+                    duration: 8,
+                    repeat: Infinity,
+                    repeatType: "reverse"
+                  }}
+                ></motion.div>
                 <Image
                   src={pokemon.sprites.other?.['official-artwork']?.front_default || pokemon.sprites.front_default || ''}
                   alt={pokemon.name}
                   fill
-                  className="object-contain"
+                  className="object-contain drop-shadow-2xl"
                   sizes="256px"
                   priority
+                  style={{ transform: 'translateZ(20px)' }}
                 />
               </div>
-            </div>
+            </motion.div>
 
             {/* Info */}
-            <div className="flex-1">
-              <div className="mb-4">
-                <h3 className="text-lg font-semibold mb-2">Information</h3>
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="flex items-center gap-2">
-                    <Ruler className="h-4 w-4 text-muted-foreground" />
+            <motion.div
+              className="flex-1"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.4, duration: 0.5 }}
+              style={{ transformStyle: 'preserve-3d' }}
+            >
+              <div className="mb-6">
+                <motion.h3
+                  className="text-xl font-semibold mb-3"
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.5 }}
+                >
+                  Information
+                </motion.h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <motion.div
+                    className="flex items-center gap-2 p-3 rounded-lg bg-card border border-border/50"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.6 }}
+                    whileHover={{ y: -5, scale: 1.02 }}
+                    style={{ transformStyle: 'preserve-3d' }}
+                  >
+                    <Ruler className="h-5 w-5 text-primary" />
                     <span>Height:</span>
                     <span className="font-medium">{formatHeight(pokemon.height)}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Scale className="h-4 w-4 text-muted-foreground" />
+                  </motion.div>
+                  <motion.div
+                    className="flex items-center gap-2 p-3 rounded-lg bg-card border border-border/50"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.7 }}
+                    whileHover={{ y: -5, scale: 1.02 }}
+                    style={{ transformStyle: 'preserve-3d' }}
+                  >
+                    <Scale className="h-5 w-5 text-primary" />
                     <span>Weight:</span>
                     <span className="font-medium">{formatWeight(pokemon.weight)}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Zap className="h-4 w-4 text-muted-foreground" />
+                  </motion.div>
+                  <motion.div
+                    className="flex items-center gap-2 p-3 rounded-lg bg-card border border-border/50"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.8 }}
+                    whileHover={{ y: -5, scale: 1.02 }}
+                    style={{ transformStyle: 'preserve-3d' }}
+                  >
+                    <Zap className="h-5 w-5 text-primary" />
                     <span>Base Exp:</span>
                     <span className="font-medium">{pokemon.base_experience}</span>
-                  </div>
+                  </motion.div>
                 </div>
               </div>
 
               {/* Types */}
-              <div className="mb-4">
-                <h3 className="text-lg font-semibold mb-2">Types</h3>
-                <div className="flex gap-2">
-                  {pokemon.types.map((typeInfo) => (
-                    <span 
+              <div className="mb-6">
+                <motion.h3
+                  className="text-xl font-semibold mb-3"
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.9 }}
+                >
+                  Types
+                </motion.h3>
+                <div className="flex gap-3">
+                  {pokemon.types.map((typeInfo, index) => (
+                    <motion.span
                       key={typeInfo.type.name}
-                      className={`px-3 py-1 rounded-full text-sm font-medium capitalize ${getTypeColor(typeInfo.type.name)}`}
+                      className={`px-4 py-2 rounded-full text-sm font-medium capitalize ${getTypeColor(typeInfo.type.name)}`}
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: 1 + index * 0.1 }}
+                      whileHover={{
+                        scale: 1.1,
+                        y: -5,
+                        boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)"
+                      }}
+                      style={{ transformStyle: 'preserve-3d' }}
                     >
                       {typeInfo.type.name}
-                    </span>
+                    </motion.span>
                   ))}
                 </div>
               </div>
 
               {/* Abilities */}
               <div>
-                <h3 className="text-lg font-semibold mb-2">Abilities</h3>
-                <div className="flex flex-wrap gap-2">
-                  {pokemon.abilities.map((abilityInfo) => (
-                    <span 
+                <motion.h3
+                  className="text-xl font-semibold mb-3"
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 1.1 }}
+                >
+                  Abilities
+                </motion.h3>
+                <div className="flex flex-wrap gap-3">
+                  {pokemon.abilities.map((abilityInfo, index) => (
+                    <motion.span
                       key={abilityInfo.ability.name}
-                      className={`px-3 py-1 rounded-full text-sm font-medium capitalize ${
-                        abilityInfo.is_hidden 
-                          ? 'bg-purple-100 text-purple-800' 
+                      className={`px-4 py-2 rounded-full text-sm font-medium capitalize ${
+                        abilityInfo.is_hidden
+                          ? 'bg-purple-100 text-purple-800'
                           : 'bg-blue-100 text-blue-800'
                       }`}
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: 1.2 + index * 0.1 }}
+                      whileHover={{
+                        scale: 1.1,
+                        y: -5,
+                        boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)"
+                      }}
+                      style={{ transformStyle: 'preserve-3d' }}
                     >
                       {abilityInfo.ability.name}
                       {abilityInfo.is_hidden && ' (Hidden)'}
-                    </span>
+                    </motion.span>
                   ))}
                 </div>
               </div>
-            </div>
+            </motion.div>
           </div>
 
           {/* Tabs */}
-          <div className="border-b mb-4">
-            <div className="flex gap-4">
-              {(['about', 'stats', 'evolution', 'moves'] as const).map((tab) => (
-                <button
+          <motion.div
+            className="border-b mb-6"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.3 }}
+          >
+            <div className="flex gap-6">
+              {(['about', 'stats', 'evolution', 'moves'] as const).map((tab, index) => (
+                <motion.button
                   key={tab}
-                  className={`pb-2 px-1 capitalize ${
-                    activeTab === tab 
-                      ? 'border-b-2 border-primary font-medium' 
+                  className={`pb-3 px-1 capitalize relative ${
+                    activeTab === tab
+                      ? 'text-primary font-medium'
                       : 'text-muted-foreground hover:text-foreground'
                   }`}
                   onClick={() => setActiveTab(tab)}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 1.4 + index * 0.1 }}
+                  whileHover={{ y: -3 }}
+                  style={{ transformStyle: 'preserve-3d' }}
                 >
                   {tab}
-                </button>
+                  {activeTab === tab && (
+                    <motion.div
+                      className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-full"
+                      layoutId="activeTab"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ duration: 0.3 }}
+                    ></motion.div>
+                  )}
+                </motion.button>
               ))}
             </div>
-          </div>
+          </motion.div>
 
           {/* Tab Content */}
-          <div className="mb-4">
+          <div className="mb-6">
             {loading ? (
-              <div className="flex justify-center py-8">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+              <div className="flex justify-center py-12">
+                <motion.div
+                  className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                ></motion.div>
               </div>
             ) : (
-              <>
+              <AnimatePresence mode="wait">
                 {/* About Tab */}
                 {activeTab === 'about' && (
-                  <div>
-                    <h3 className="text-lg font-semibold mb-3">Pokédex Data</h3>
-                    <div className="space-y-3">
-                      <div>
-                        <h4 className="font-medium text-muted-foreground">Description</h4>
+                  <motion.div
+                    key="about"
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 20 }}
+                    transition={{ duration: 0.3 }}
+                    style={{ transformStyle: 'preserve-3d' }}
+                  >
+                    <h3 className="text-xl font-semibold mb-4">Pokédex Data</h3>
+                    <div className="space-y-4">
+                      <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.1 }}
+                        className="p-4 rounded-lg bg-card border border-border/50"
+                        whileHover={{ y: -3 }}
+                        style={{ transformStyle: 'preserve-3d' }}
+                      >
+                        <h4 className="font-medium text-muted-foreground mb-2">Description</h4>
                         <p className="mt-1">
                           No description available.
                         </p>
-                      </div>
-                      <div className="grid grid-cols-2 gap-3">
-                        <div>
-                          <h4 className="font-medium text-muted-foreground">Species</h4>
-                          <p className="capitalize">Unknown</p>
-                        </div>
-                        <div>
-                          <h4 className="font-medium text-muted-foreground">Color</h4>
-                          <p className="capitalize">Unknown</p>
-                        </div>
-                        <div>
-                          <h4 className="font-medium text-muted-foreground">Habitat</h4>
-                          <p className="capitalize">Unknown</p>
-                        </div>
-                        <div>
-                          <h4 className="font-medium text-muted-foreground">Shape</h4>
-                          <p className="capitalize">Unknown</p>
-                        </div>
+                      </motion.div>
+                      <div className="grid grid-cols-2 gap-4">
+                        {['Species', 'Color', 'Habitat', 'Shape'].map((item, index) => (
+                          <motion.div
+                            key={item}
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.2 + index * 0.1 }}
+                            className="p-4 rounded-lg bg-card border border-border/50"
+                            whileHover={{ y: -3 }}
+                            style={{ transformStyle: 'preserve-3d' }}
+                          >
+                            <h4 className="font-medium text-muted-foreground">{item}</h4>
+                            <p className="capitalize mt-1">Unknown</p>
+                          </motion.div>
+                        ))}
                       </div>
                     </div>
-                  </div>
+                  </motion.div>
                 )}
 
                 {/* Stats Tab */}
                 {activeTab === 'stats' && (
-                  <div>
-                    <h3 className="text-lg font-semibold mb-3">Base Stats</h3>
-                    <div className="space-y-3">
-                      {Object.entries(STAT_NAMES).map(([statKey, statName]) => {
+                  <motion.div
+                    key="stats"
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 20 }}
+                    transition={{ duration: 0.3 }}
+                    style={{ transformStyle: 'preserve-3d' }}
+                  >
+                    <h3 className="text-xl font-semibold mb-4">Base Stats</h3>
+                    <div className="space-y-4">
+                      {Object.entries(STAT_NAMES).map(([statKey, statName], index) => {
                         const value = getStatValue(statKey);
                         return (
-                          <div key={statKey}>
-                            <div className="flex justify-between mb-1">
+                          <motion.div
+                            key={statKey}
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: 0.1 + index * 0.1 }}
+                            className="p-3 rounded-lg bg-card border border-border/50"
+                            whileHover={{ y: -3 }}
+                            style={{ transformStyle: 'preserve-3d' }}
+                          >
+                            <div className="flex justify-between mb-2">
                               <span className="font-medium">{statName}</span>
-                              <span>{value}</span>
+                              <span className="font-bold">{value}</span>
                             </div>
-                            <div className="w-full bg-secondary rounded-full h-2.5">
-                              <div 
-                                className={`h-2.5 rounded-full ${getStatColor(value)}`} 
-                                style={{ width: `${Math.min(100, (value / 255) * 100)}%` }}
-                              ></div>
+                            <div className="w-full bg-secondary rounded-full h-3 overflow-hidden">
+                              <motion.div
+                                className={`h-full rounded-full ${getStatColor(value)}`}
+                                initial={{ width: 0 }}
+                                animate={{ width: `${Math.min(100, (value / 255) * 100)}%` }}
+                                transition={{ duration: 0.8, delay: 0.2 + index * 0.1 }}
+                              ></motion.div>
                             </div>
-                          </div>
+                          </motion.div>
                         );
                       })}
-                      <div className="pt-2 border-t">
-                        <div className="flex justify-between mb-1">
-                          <span className="font-medium">Total</span>
-                          <span>{pokemon.stats.reduce((sum, stat) => sum + stat.base_stat, 0)}</span>
+                      <motion.div
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.8 }}
+                        className="pt-3 border-t"
+                      >
+                        <div className="flex justify-between">
+                          <span className="font-bold text-lg">Total</span>
+                          <span className="font-bold text-lg">
+                            {pokemon.stats.reduce((sum, stat) => sum + stat.base_stat, 0)}
+                          </span>
                         </div>
-                      </div>
+                      </motion.div>
                     </div>
-                  </div>
+                  </motion.div>
                 )}
 
                 {/* Evolution Tab */}
                 {activeTab === 'evolution' && (
-                  <div>
-                    <h3 className="text-lg font-semibold mb-3">Evolution Chain</h3>
-                    <div className="text-center">
+                  <motion.div
+                    key="evolution"
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 20 }}
+                    transition={{ duration: 0.3 }}
+                    style={{ transformStyle: 'preserve-3d' }}
+                  >
+                    <h3 className="text-xl font-semibold mb-4">Evolution Chain</h3>
+                    <div className="text-center py-8">
                       <p className="text-muted-foreground">Evolution chain data would be displayed here</p>
                     </div>
-                  </div>
+                  </motion.div>
                 )}
 
                 {/* Moves Tab */}
                 {activeTab === 'moves' && (
-                  <div>
-                    <h3 className="text-lg font-semibold mb-3">Moves</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                      {pokemon.moves.slice(0, 8).map((moveInfo) => {
+                  <motion.div
+                    key="moves"
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 20 }}
+                    transition={{ duration: 0.3 }}
+                    style={{ transformStyle: 'preserve-3d' }}
+                  >
+                    <h3 className="text-xl font-semibold mb-4">Moves</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {pokemon.moves.slice(0, 8).map((moveInfo, index) => {
                         const moveDetail = moveDetails[moveInfo.move.name];
                         return (
-                          <div key={moveInfo.move.name} className="border rounded-lg p-3">
-                            <div className="font-medium capitalize">{moveInfo.move.name.replace('-', ' ')}</div>
+                          <motion.div
+                            key={moveInfo.move.name}
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.1 + index * 0.1 }}
+                            className="border rounded-xl p-4 bg-card"
+                            whileHover={{
+                              y: -5,
+                              boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)"
+                            }}
+                            style={{ transformStyle: 'preserve-3d' }}
+                          >
+                            <div className="font-bold capitalize text-lg mb-2">
+                              {moveInfo.move.name.replace('-', ' ')}
+                            </div>
                             {moveDetail && (
-                              <div className="text-sm text-muted-foreground mt-1">
-                                <div>Power: {moveDetail.power || '-'}</div>
-                                <div>Accuracy: {moveDetail.accuracy || '-'}</div>
-                                <div>PP: {moveDetail.pp || '-'}</div>
-                                <div>Type: <span className="capitalize">{moveDetail.type.name}</span></div>
+                              <div className="text-sm text-muted-foreground mt-2 space-y-1">
+                                <div className="flex justify-between">
+                                  <span>Power:</span>
+                                  <span className="font-medium">{moveDetail.power || '-'}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                  <span>Accuracy:</span>
+                                  <span className="font-medium">{moveDetail.accuracy || '-'}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                  <span>PP:</span>
+                                  <span className="font-medium">{moveDetail.pp || '-'}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                  <span>Type:</span>
+                                  <span className="font-medium capitalize">{moveDetail.type.name}</span>
+                                </div>
                               </div>
                             )}
-                          </div>
+                          </motion.div>
                         );
                       })}
                     </div>
-                  </div>
+                  </motion.div>
                 )}
-              </>
+              </AnimatePresence>
             )}
           </div>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 };

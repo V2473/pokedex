@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Pokemon } from '@/types';
 import { usePokemonStore, useFilterStore, useUIStore } from '@/stores';
-import { PokemonCard, PokemonCardSkeleton } from '@/components/pokemon';
+import { PokemonCard3D, PokemonCard3DSkeleton } from '@/components/pokemon';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Pagination, LoadingError } from '@/components/ui';
@@ -92,7 +92,7 @@ export const PokemonGrid: React.FC<PokemonGridProps> = ({
   // Render loading skeletons
   const renderSkeletons = () => {
     return Array(limit).fill(0).map((_, index) => (
-      <PokemonCardSkeleton key={`skeleton-${index}`} />
+      <PokemonCard3DSkeleton key={`skeleton-${index}`} />
     ));
   };
 
@@ -187,23 +187,51 @@ export const PokemonGrid: React.FC<PokemonGridProps> = ({
       {loading !== 'loading' && !error && displayList.length > 0 && (
         <>
           <motion.div
-            className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"
+            className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 p-4 rounded-xl bg-gradient-to-br from-background to-muted/20 backdrop-blur-sm border border-border/50 shadow-lg"
+            style={{
+              transform: 'perspective(1500px) rotateX(2deg)',
+              transformStyle: 'preserve-3d'
+            }}
             layout
             role="list"
             aria-label="Pokémon list"
           >
             <AnimatePresence>
-              {displayList.map((p: Pokemon) => (
+              {displayList.map((p: Pokemon, index) => (
                 <motion.div
                   key={p.id}
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.8 }}
-                  transition={{ duration: 0.3 }}
+                  initial={{
+                    opacity: 0,
+                    scale: 0.8,
+                    rotateY: -15,
+                    z: -50
+                  }}
+                  animate={{
+                    opacity: 1,
+                    scale: 1,
+                    rotateY: 0,
+                    z: 0
+                  }}
+                  exit={{
+                    opacity: 0,
+                    scale: 0.8,
+                    rotateY: 15,
+                    z: -50
+                  }}
+                  transition={{
+                    duration: 0.4,
+                    delay: index * 0.05,
+                    type: "spring",
+                    stiffness: 300,
+                    damping: 20
+                  }}
                   layout
+                  style={{
+                    transformStyle: 'preserve-3d'
+                  }}
                   role="listitem"
                 >
-                  <PokemonCard
+                  <PokemonCard3D
                     pokemon={p}
                     onClick={() => handlePokemonClick(p)}
                     showStats={showStats}
@@ -215,14 +243,33 @@ export const PokemonGrid: React.FC<PokemonGridProps> = ({
 
           {/* Pagination */}
           <motion.div
-            className="pt-4"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.2 }}
+            className="pt-6 flex justify-center"
+            initial={{
+              opacity: 0,
+              y: 20,
+              rotateX: 10
+            }}
+            animate={{
+              opacity: 1,
+              y: 0,
+              rotateX: 0
+            }}
+            transition={{
+              delay: 0.3,
+              duration: 0.5,
+              type: "spring",
+              stiffness: 200
+            }}
+            style={{
+              transformStyle: 'preserve-3d',
+              perspective: '1000px'
+            }}
             role="navigation"
             aria-label="Pagination"
           >
-            <Pagination totalItems={count} />
+            <div className="transform-gpu hover:scale-105 transition-transform duration-300">
+              <Pagination totalItems={count} />
+            </div>
           </motion.div>
         </>
       )}

@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { Header, Footer, MainContainer } from '@/components/layout';
 import { PokemonGrid } from '@/components/pokemon';
+import { Background3D } from '@/components/backgrounds';
 import { useUIStore } from '@/stores';
 import { ThemeProvider } from '@/components/theme/ThemeProvider';
 import { Pokemon } from '@/types';
@@ -41,21 +42,27 @@ export default function Home() {
 
   return (
     <ThemeProvider>
-      <div className="min-h-screen flex flex-col bg-background">
-        <Header />
-        <MainContainer>
-          <div className="space-y-6">
-            <div className="text-center py-6">
-              <h1 className="text-4xl font-bold">Pokédex</h1>
-              <p className="text-muted-foreground mt-2">
-                Explore the world of Pokémon
-              </p>
+      <div className="min-h-screen flex flex-col bg-background relative">
+        {/* 3D Background */}
+        <Background3D />
+
+        {/* Content */}
+        <div className="relative z-10">
+          <Header />
+          <MainContainer>
+            <div className="space-y-6">
+              <div className="text-center py-6">
+                <h1 className="text-4xl font-bold transform-gpu hover:scale-105 transition-transform duration-300">Pokédex</h1>
+                <p className="text-muted-foreground mt-2 transform-gpu hover:scale-105 transition-transform duration-300">
+                  Explore the world of Pokémon
+                </p>
+              </div>
+              <PokemonGrid />
             </div>
-            <PokemonGrid />
-          </div>
-        </MainContainer>
-        <Footer />
-        
+          </MainContainer>
+          <Footer />
+        </div>
+
         {/* Pokemon Modal */}
         {renderPokemonModal()}
       </div>

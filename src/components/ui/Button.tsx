@@ -1,4 +1,8 @@
+'use client';
+
 import React from 'react';
+import { motion } from 'framer-motion';
+import type { HTMLMotionProps } from 'framer-motion';
 
 // Define button variants
 const buttonVariants = {
@@ -19,10 +23,11 @@ const buttonSizes = {
 };
 
 // Define button props
-export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+export interface ButtonProps extends Omit<HTMLMotionProps<'button'>, 'className'> {
   variant?: keyof typeof buttonVariants;
   size?: keyof typeof buttonSizes;
   asChild?: boolean;
+  className?: string;
 }
 
 // Button component
@@ -35,7 +40,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     ...props
   }, ref) => {
     return (
-      <button
+      <motion.button
         className={`inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 ${buttonVariants[variant]} ${buttonSizes[size]} ${className}`}
         ref={ref}
         {...props}
